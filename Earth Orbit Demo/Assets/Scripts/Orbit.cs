@@ -44,6 +44,7 @@ public class Orbit : MonoBehaviour
     private double orbitalSemimajorAxis;
 
     public bool simulateAtSuperSpeed;
+    public float superSpeedMultiplier;
 
     public bool fixTimeAtEpoch;
 
@@ -55,7 +56,7 @@ public class Orbit : MonoBehaviour
 
     float GetVernalEquinoxAngle()
     {
-        Julian j = new Julian(DateTime.UtcNow);
+        Julian j = new Julian(GetCurrentDateTime());
         float vernalEquinoxAngle = Mathf.Rad2Deg * (float)j.ToGmst();
 
         return vernalEquinoxAngle;
@@ -107,7 +108,7 @@ public class Orbit : MonoBehaviour
         orbitingBody.transform.localPosition = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
 
         float vernalEquinoxAngle = GetVernalEquinoxAngle();
-        Debug.Log("vernalEquinoxAngle : " + vernalEquinoxAngle);
+        //Debug.Log("vernalEquinoxAngle : " + vernalEquinoxAngle);
 
         orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
 
@@ -141,7 +142,7 @@ public class Orbit : MonoBehaviour
         }
         else if (simulateAtSuperSpeed)
         {
-            return DateTime.UtcNow + TimeSpan.FromSeconds(Time.realtimeSinceStartup * 500.0);
+            return DateTime.UtcNow + TimeSpan.FromSeconds(Time.realtimeSinceStartup * superSpeedMultiplier);
         }
         else
         {
