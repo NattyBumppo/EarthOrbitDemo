@@ -107,6 +107,7 @@ public class Orbit : MonoBehaviour
         orbitingBody.transform.position = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
 
         float vernalEquinoxAngle = GetVernalEquinoxAngle();
+        Debug.Log("vernalEquinoxAngle : " + vernalEquinoxAngle);
 
         orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
 
