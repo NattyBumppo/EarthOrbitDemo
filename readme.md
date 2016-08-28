@@ -1,0 +1,3 @@
+# Summary
+
+This is a Unity project that simulates the movement of the International Space Station around the Earth, with realistic lighting and accurate orbits. I'm using Michael F. Henry's [OrbitTools library](http://www.zeptomoby.com/satellites/) for orbit calculation. (I started trying to calculate everything myself from orbital ephemerides, but using a third-party library turned out to be many times easier!)
