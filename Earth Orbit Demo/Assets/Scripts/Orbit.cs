@@ -34,7 +34,7 @@ public class Orbit : MonoBehaviour
     public int epochSeconds;
     public OrbitalSystem orbitalSystem;
 
-    private Vector3 orbitalPlaneRotationalAxis;
+    private const double SECONDS_PER_YEAR = 365.25 * 24.0 * 3600.0;
 
     public float orbitScaleFactor;
 
@@ -46,12 +46,36 @@ public class Orbit : MonoBehaviour
     {
         orbitalSemimajorAxis = (periapsisKm + apoapsisKm) / 2.0;
         epochDatetime = new DateTime(epochYear, epochMonth, epochDay, epochHours, epochMinutes, epochSeconds, DateTimeKind.Utc);
-        orbitalPlaneRotationalAxis = new Vector3(Mathf.Cos(Mathf.Deg2Rad * (float)raanDeg), 0.0f, Mathf.Sin((float)raanDeg));
+    }
+
+    Vector3 GetOrbitalPlaneRotationalAxis()
+    {
+        // The orbital plane is inclined on an axis that is described by the RAAN, which is an angular
+        // offset from the vector to the vernal equinox (a.k.a. the First Point of Aries).
+        // First, we have to find the angle of the vernal equinox in world space...
+
+        // This is super-approximate...
+        double secondsSinceVernalEquinox = (GetCurrentDateTime() - new DateTime(GetCurrentDateTime().Year, 3, 20)).TotalSeconds;
+        if (secondsSinceVernalEquinox < 0)
+        {
+            secondsSinceVernalEquinox += SECONDS_PER_YEAR;
+        }
+
+        double angleTraveledThroughOrbitSinceVernalEquinoxDeg = 360.0 * (secondsSinceVernalEquinox / SECONDS_PER_YEAR);
+
+        //Debug.Log(angleTraveledThroughOrbitSinceVernalEquinoxDeg);
+
+        // Now, use this angle as an offset to the RAAN to calculate the orbital plane rotation
+        double totalAngle = -angleTraveledThroughOrbitSinceVernalEquinoxDeg + raanDeg;
+        Vector3 orbitalPlaneRotationalAxis = new Vector3(Mathf.Cos(Mathf.Deg2Rad * (float)totalAngle), 0.0f, Mathf.Sin((float)totalAngle));
+
+        return orbitalPlaneRotationalAxis;
     }
 
     void Update()
     {
-        Debug.DrawLine(new Vector3(0f, 0f, 0f), orbitalPlaneRotationalAxis.normalized * 1000.0f, Color.red);
+        Debug.DrawLine(new Vector3(0f, 0f, 0f), GetOrbitalPlaneRotationalAxis().normalized * 2000.0f, Color.red);
+
         // Test
         //Debug.Log("Earth radius: " + (centralBody.GetComponent<Renderer>().bounds.extents.magnitude / 2.0f).ToString());
 
@@ -61,7 +85,7 @@ public class Orbit : MonoBehaviour
         double eccentricAnomaly = GetEccentricAnomaly(meanAnomaly);
         //Debug.Log("eccentricAnomaly: " + eccentricAnomaly.ToString());
         double trueAnomaly = GetTrueAnomaly(eccentricAnomaly);
-        //Debug.Log("trueAnomaly: " + trueAnomaly.ToString());
+        //Debug.Log("trueAnomaly: " + (trueAnomaly * Mathf.Rad2Deg).ToString());
 
         double currentRadius = orbitScaleFactor * GetRadiusInOrbit(trueAnomaly);
         //Debug.Log("Radius in orbit: " + currentRadius);
@@ -79,10 +103,10 @@ public class Orbit : MonoBehaviour
         double angleInOrbit = Mathf.Deg2Rad * argPeriapsisDeg + trueAnomaly;
 
         //Debug.Log("angle: " + angleInOrbit.ToString());
-        
+
         // Determine a position at this point in orbit
         Vector3 eclipticOrbitalPosition = new Vector3((float)currentRadius * (float)Math.Cos(angleInOrbit), 0.0f, (float)currentRadius * (float)Math.Sin(angleInOrbit));
-        
+
         //Debug.Log(eclipticOrbitalPosition);
 
         orbitingBody.localPosition = eclipticOrbitalPosition;
@@ -90,10 +114,12 @@ public class Orbit : MonoBehaviour
         // Now, rotate the position around the axis of the ascending node by the inclination
         //Vector3 centralBodyVector = transform.position - centralBody.position;
 
-        orbitingBody.RotateAround(centralBody.position, orbitalPlaneRotationalAxis, (float)inclination);
+        orbitingBody.RotateAround(centralBody.position, GetOrbitalPlaneRotationalAxis(), (float)inclination);
 
         // Correct local rotation
         orbitingBody.localRotation = Quaternion.identity;
+
+        //Debug.DrawLine(new Vector3(0f, 0f, 0f), orbitingBody.position, Color.green);
     }
 
     DateTime GetCurrentDateTime()
@@ -105,8 +131,9 @@ public class Orbit : MonoBehaviour
     {
         double timeSincePeriapsisAtEpoch = meanAnomalyAtEpoch / GetMeanMotion();
         //Debug.Log("Time since peri at epoch: " + timeSincePeriapsisAtEpoch.ToString());
-        
-        TimeSpan elapsedTime = GetCurrentDateTime() - epochDatetime;
+
+        //TimeSpan elapsedTime = GetCurrentDateTime() - epochDatetime;
+        TimeSpan elapsedTime = GetCurrentDateTime() - epochDatetime + TimeSpan.FromSeconds(Time.realtimeSinceStartup * 5000.0);
 
         return elapsedTime.TotalSeconds + timeSincePeriapsisAtEpoch;
     }
