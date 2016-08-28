@@ -1,0 +1,4 @@
+D:\Dropbox\earth_orbit\OrbitTools\Core\bin\Release\Zeptomoby.OrbitTools.Core.dll
+D:\Dropbox\earth_orbit\OrbitTools\Core\bin\Release\Zeptomoby.OrbitTools.Core.pdb
+D:\Dropbox\earth_orbit\OrbitTools\Core\obj\Release\Zeptomoby.OrbitTools.Core.dll
+D:\Dropbox\earth_orbit\OrbitTools\Core\obj\Release\Zeptomoby.OrbitTools.Core.pdb

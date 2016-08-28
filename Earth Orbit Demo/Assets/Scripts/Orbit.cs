@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Zeptomoby.OrbitTools;
 
 public enum OrbitalSystem
 {
@@ -42,10 +43,22 @@ public class Orbit : MonoBehaviour
 
     private double orbitalSemimajorAxis;
 
+    public bool simulateAtSuperSpeed;
+
+    public bool fixTimeAtEpoch;
+
     void Start()
     {
         orbitalSemimajorAxis = (periapsisKm + apoapsisKm) / 2.0;
         epochDatetime = new DateTime(epochYear, epochMonth, epochDay, epochHours, epochMinutes, epochSeconds, DateTimeKind.Utc);
+    }
+
+    float GetVernalEquinoxAngle()
+    {
+        Julian j = new Julian(DateTime.UtcNow);
+        float vernalEquinoxAngle = Mathf.Rad2Deg * (float)j.ToGmst();
+
+        return vernalEquinoxAngle;
     }
 
     Vector3 GetOrbitalPlaneRotationalAxis()
@@ -67,15 +80,40 @@ public class Orbit : MonoBehaviour
 
         // Now, use this angle as an offset to the RAAN to calculate the orbital plane rotation
         double totalAngle = -angleTraveledThroughOrbitSinceVernalEquinoxDeg + raanDeg;
-        Vector3 orbitalPlaneRotationalAxis = new Vector3(Mathf.Cos(Mathf.Deg2Rad * (float)totalAngle), 0.0f, Mathf.Sin((float)totalAngle));
+        //double totalAngle = raanDeg;
+        Vector3 orbitalPlaneRotationalAxis = new Vector3(Mathf.Cos(Mathf.Deg2Rad * (float)totalAngle), 0.0f, Mathf.Sin(Mathf.Deg2Rad * (float)totalAngle));
 
         return orbitalPlaneRotationalAxis;
     }
 
+
+
     void Update()
     {
-        Debug.DrawLine(new Vector3(0f, 0f, 0f), GetOrbitalPlaneRotationalAxis().normalized * 2000.0f, Color.red);
 
+        // Orbit tools test
+        string str1 = "ISS test";
+        string str2 = "1 25544U 98067A   16241.14655215  .00003187  00000-0  54953-4 0  9992";
+        string str3 = "2 25544  51.6453  58.9571 0002981 250.0016 221.6665 15.54339053 16187";
+
+        Tle issTle = new Tle(str1, str2, str3);
+        Satellite sat = new Satellite(issTle);
+        Eci eci = sat.PositionEci(GetCurrentDateTime());
+        //Debug.Log("(" + eci.Position.X + ", " + eci.Position.Y + ", " + eci.Position.Z + ")");
+        
+
+        //Debug.DrawLine(new Vector3(0f, 0f, 0f), GetOrbitalPlaneRotationalAxis().normalized * 500.0f, Color.red);
+
+        orbitingBody.transform.position = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
+
+        float vernalEquinoxAngle = GetVernalEquinoxAngle();
+
+        orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
+
+        // Correct local rotation
+        orbitingBody.localRotation = Quaternion.identity;
+
+        return;
         // Test
         //Debug.Log("Earth radius: " + (centralBody.GetComponent<Renderer>().bounds.extents.magnitude / 2.0f).ToString());
 
@@ -94,46 +132,35 @@ public class Orbit : MonoBehaviour
         //Debug.Log("Position: " + orbitingBody.position);
     }
 
-    void MoveToPositionInOrbit(double trueAnomaly, double currentRadius)
-    {
-        // Angle in orbit will be argument of periapsis + true anomaly, corrected by the RAAN
-        //double angleInOrbit = Mathf.Deg2Rad * argPeriapsisDeg + trueAnomaly + Mathf.Deg2Rad * raanDeg;
-
-        // Angle in orbit will be argument of periapsis + true anomaly
-        double angleInOrbit = Mathf.Deg2Rad * argPeriapsisDeg + trueAnomaly;
-
-        //Debug.Log("angle: " + angleInOrbit.ToString());
-
-        // Determine a position at this point in orbit
-        Vector3 eclipticOrbitalPosition = new Vector3((float)currentRadius * (float)Math.Cos(angleInOrbit), 0.0f, (float)currentRadius * (float)Math.Sin(angleInOrbit));
-
-        //Debug.Log(eclipticOrbitalPosition);
-
-        orbitingBody.localPosition = eclipticOrbitalPosition;
-
-        // Now, rotate the position around the axis of the ascending node by the inclination
-        //Vector3 centralBodyVector = transform.position - centralBody.position;
-
-        orbitingBody.RotateAround(centralBody.position, GetOrbitalPlaneRotationalAxis(), (float)inclination);
-
-        // Correct local rotation
-        orbitingBody.localRotation = Quaternion.identity;
-
-        //Debug.DrawLine(new Vector3(0f, 0f, 0f), orbitingBody.position, Color.green);
-    }
-
     DateTime GetCurrentDateTime()
     {
-        return DateTime.UtcNow;
+        if (fixTimeAtEpoch)
+        {
+            return epochDatetime;
+        }
+        else if (simulateAtSuperSpeed)
+        {
+            return DateTime.UtcNow + TimeSpan.FromSeconds(Time.realtimeSinceStartup * 500.0);
+        }
+        else
+        {
+            return DateTime.UtcNow;
+        }
     }
 
     double GetTimeSincePeriapsis()
     {
+
         double timeSincePeriapsisAtEpoch = meanAnomalyAtEpoch / GetMeanMotion();
+
+        TimeSpan elapsedTime;
+
+        elapsedTime = GetCurrentDateTime() - epochDatetime;
+
+
         //Debug.Log("Time since peri at epoch: " + timeSincePeriapsisAtEpoch.ToString());
 
-        //TimeSpan elapsedTime = GetCurrentDateTime() - epochDatetime;
-        TimeSpan elapsedTime = GetCurrentDateTime() - epochDatetime + TimeSpan.FromSeconds(Time.realtimeSinceStartup * 5000.0);
+        //
 
         return elapsedTime.TotalSeconds + timeSincePeriapsisAtEpoch;
     }
@@ -212,5 +239,35 @@ public class Orbit : MonoBehaviour
         double numerator = 1.0 - this.eccentricity * this.eccentricity;
         double denominator = 1 + this.eccentricity * trueAnomaly;
         return orbitalSemimajorAxis * (numerator / denominator);
+    }
+
+    void MoveToPositionInOrbit(double trueAnomaly, double currentRadius)
+    {
+        // Angle in orbit will be argument of periapsis + true anomaly, corrected by the RAAN
+        //double angleInOrbit = Mathf.Deg2Rad * argPeriapsisDeg + trueAnomaly + Mathf.Deg2Rad * raanDeg;
+
+        // Angle in orbit will be argument of periapsis + true anomaly
+        double angleInOrbit = Mathf.Deg2Rad * argPeriapsisDeg + trueAnomaly;
+
+        //Debug.Log("angle: " + angleInOrbit.ToString());
+
+        // Determine a position at this point in orbit
+        Vector3 eclipticOrbitalPosition = new Vector3((float)currentRadius * (float)Math.Cos(angleInOrbit), 0.0f, (float)currentRadius * (float)Math.Sin(angleInOrbit));
+
+        //Debug.Log(eclipticOrbitalPosition);
+
+        orbitingBody.localPosition = eclipticOrbitalPosition;
+
+        // Now, rotate the position around the axis of the ascending node by the inclination
+        //Vector3 centralBodyVector = transform.position - centralBody.position;
+
+        orbitingBody.RotateAround(centralBody.position, GetOrbitalPlaneRotationalAxis(), (float)inclination);
+
+        // Correct local rotation
+        orbitingBody.localRotation = Quaternion.identity;
+
+        Debug.Log("Position in orbit: " + orbitingBody.position);
+
+        //Debug.DrawLine(new Vector3(0f, 0f, 0f), orbitingBody.position, Color.green);
     }
 }

@@ -8,6 +8,7 @@ public class RotationAndTilt : MonoBehaviour
     private const double EARTH_TILT_DEG = 23.439281;
 
     private const int SECONDS_PER_DAY = 86400;
+    private const double SECONDS_PER_YEAR = 365.25 * 24.0 * 3600.0;
 
     //public double rotationSpeedMultiplier;
 
@@ -57,8 +58,24 @@ public class RotationAndTilt : MonoBehaviour
         RotateToEffectTilt();
     }
 
+    DateTime GetCurrentDateTime()
+    {
+        return DateTime.UtcNow;
+    }
+
     private void RotateToEffectTilt()
     {
+        // This is super-approximate...
+        double secondsSinceVernalEquinox = (GetCurrentDateTime() - new DateTime(GetCurrentDateTime().Year, 3, 20)).TotalSeconds;
+        if (secondsSinceVernalEquinox < 0)
+        {
+            secondsSinceVernalEquinox += SECONDS_PER_YEAR;
+        }
+
+        double percentageOfYearSinceVernalEquinoxDeg = (secondsSinceVernalEquinox / SECONDS_PER_YEAR);
+
+
+
 
     }
 }

@@ -8,8 +8,8 @@ public class ScaleToActualSize : MonoBehaviour
     public float scaleMultiplier;
     public float averageObjectRadiusKm;
 
-	void Start()
-	{
+    void Start()
+    {
         float mainObjectCurrentRadius = mainObject.GetComponent<SphereCollider>().radius;
         float cloudLayerCurrentRadius = cloudLayer.GetComponent<SphereCollider>().radius;
 
