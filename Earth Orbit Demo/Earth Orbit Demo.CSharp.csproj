@@ -63,11 +63,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\EarthDayNightManagement.cs" />
-    <Compile Include="Assets\EarthRotation.cs" />
-    <Compile Include="Assets\EarthTilt.cs" />
-    <Compile Include="Assets\Orbit.cs" />
-    <Compile Include="Assets\TraceLineTrail.cs" />
+    <Compile Include="Assets\ScaleToActualSize.cs" />
+    <Compile Include="Assets\Scripts\EarthDayNightManagement.cs" />
+    <Compile Include="Assets\Scripts\LookUpTables.cs" />
+    <Compile Include="Assets\Scripts\Orbit.cs" />
+    <Compile Include="Assets\Scripts\RotationAndTilt.cs" />
+    <Compile Include="Assets\Scripts\TraceLineTrail.cs" />
+    <Compile Include="Assets\SetRunInBackground.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
