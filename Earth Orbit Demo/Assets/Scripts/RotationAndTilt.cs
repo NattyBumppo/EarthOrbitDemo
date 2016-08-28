@@ -9,6 +9,7 @@ public class RotationAndTilt : MonoBehaviour
 
     private const int SECONDS_PER_DAY = 86400;
     private const double SECONDS_PER_YEAR = 365.25 * 24.0 * 3600.0;
+    public float correctionAngle;
 
     //public double rotationSpeedMultiplier;
 
@@ -41,7 +42,7 @@ public class RotationAndTilt : MonoBehaviour
 
         //rotationAngleDeg = 0.0;
 
-        t.localRotation = Quaternion.AngleAxis((float)rotationAngleDeg, Vector3.up);
+        t.localRotation = Quaternion.AngleAxis((float)rotationAngleDeg + correctionAngle, Vector3.up);
     }
 
 

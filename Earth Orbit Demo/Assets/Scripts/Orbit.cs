@@ -104,7 +104,7 @@ public class Orbit : MonoBehaviour
 
         //Debug.DrawLine(new Vector3(0f, 0f, 0f), GetOrbitalPlaneRotationalAxis().normalized * 500.0f, Color.red);
 
-        orbitingBody.transform.position = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
+        orbitingBody.transform.localPosition = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
 
         float vernalEquinoxAngle = GetVernalEquinoxAngle();
         Debug.Log("vernalEquinoxAngle : " + vernalEquinoxAngle);
