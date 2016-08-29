@@ -34,7 +34,7 @@ public class SatelliteOrbit : MonoBehaviour
         sat = new Satellite(tle);
     }
 
-    void Update()
+    void LateUpdate()
     {
         Eci eci = sat.PositionEci(configManager.GetCurrentDateTime());
 
@@ -43,9 +43,6 @@ public class SatelliteOrbit : MonoBehaviour
         float vernalEquinoxAngle = GetVernalEquinoxAngle();
 
         orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
-
-        // Correct local rotation
-        orbitingBody.localRotation = Quaternion.identity;
 
         return;
     }

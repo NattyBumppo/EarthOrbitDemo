@@ -14,7 +14,9 @@ public class EarthRotationAndTilt : MonoBehaviour
     public Transform cloudLayer;
 
     public Light sunDirectionalLight;
-    
+
+    public bool maintainCorrectTilt;
+
     // Rotates the provided transform to match Earth's rotation in UTC time
     private void RotateEarthToMatchUtcTime(Transform t, DateTime utcTime)
     {
@@ -40,7 +42,12 @@ public class EarthRotationAndTilt : MonoBehaviour
 	{
         RotateEarthToMatchUtcTime(this.transform, DateTime.UtcNow);
         RotateEarthToMatchUtcTime(cloudLayer, DateTime.UtcNow);
-        RotateToEffectTilt();
+
+        if (maintainCorrectTilt)
+        {
+            RotateToEffectTilt();
+        }
+        
     }
 
     DateTime GetCurrentDateTime()

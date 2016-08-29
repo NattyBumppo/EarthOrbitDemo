@@ -13,6 +13,7 @@ public class ConfigManager : MonoBehaviour
     public bool realtimeSimulation;
     public bool drawSatelliteTrails;
     public Material satelliteTrailmaterial;
+    public Transform cloudLayer;
 
     public List<Transform> satellites;
 
@@ -50,6 +51,11 @@ public class ConfigManager : MonoBehaviour
     {
         drawSatelliteTrails = newValue;
         ClearSatelliteTrails();
+    }
+
+    public void OnToggleCloudLayer(bool newValue)
+    {
+        cloudLayer.gameObject.SetActive(newValue);
     }
 
     private void SetDateTimeLabel()
