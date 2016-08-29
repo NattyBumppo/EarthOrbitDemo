@@ -69,6 +69,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MouseRotateCamera.cs" />
+    <Compile Include="Assets\Scripts\ConfigManager.cs" />
     <Compile Include="Assets\Scripts\EarthRotationAndTilt.cs" />
     <Compile Include="Assets\Scripts\LookUpTables.cs" />
     <Compile Include="Assets\Scripts\MouseOrbit.cs" />
@@ -78,6 +80,10 @@
     <Compile Include="Assets\Scripts\SetRunInBackground.cs" />
     <Compile Include="Assets\Scripts\TraceLineTrail.cs" />
     <Compile Include="Assets\Scripts\TurnTextTowardsViewer.cs" />
+    <Compile Include="Assets\StartCameraOnLightSideOfEarth.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\3DText.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

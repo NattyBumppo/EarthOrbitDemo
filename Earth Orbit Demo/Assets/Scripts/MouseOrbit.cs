@@ -23,8 +23,8 @@ public class MouseOrbit : MonoBehaviour
 
     private Rigidbody rigidbody;
 
-    float x = 0.0f;
-    float y = 0.0f;
+    public float x = 0.0f;
+    public float y = 0.0f;
 
     // Use this for initialization
     void Start()

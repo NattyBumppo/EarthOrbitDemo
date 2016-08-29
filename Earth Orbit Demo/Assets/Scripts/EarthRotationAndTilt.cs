@@ -12,6 +12,8 @@ public class EarthRotationAndTilt : MonoBehaviour
     public float correctionAngle;
 
     public Transform cloudLayer;
+
+    public Light sunDirectionalLight;
     
     // Rotates the provided transform to match Earth's rotation in UTC time
     private void RotateEarthToMatchUtcTime(Transform t, DateTime utcTime)
@@ -56,5 +58,16 @@ public class EarthRotationAndTilt : MonoBehaviour
         }
 
         double percentageOfYearSinceVernalEquinoxDeg = (secondsSinceVernalEquinox / SECONDS_PER_YEAR);
+
+        // At vernal equinox, Earth's tilt vector lines up with the Earth-Sun vector. A quarter of a year
+        // later, the two vectors are perpindicular. We can use the time after vernal equinox to determine
+        // the axial tilt vector with respect to the Earth-Sun vector.
+        Vector3 earthSunVector = -sunDirectionalLight.transform.forward.normalized;
+
+        double rotationAmount = percentageOfYearSinceVernalEquinoxDeg * 360.0;
+
+        Vector3 tiltVector = Quaternion.AngleAxis((float)rotationAmount, Vector3.up) * earthSunVector;
+
+        transform.Rotate(tiltVector, (float)EARTH_TILT_DEG);
     }
 }

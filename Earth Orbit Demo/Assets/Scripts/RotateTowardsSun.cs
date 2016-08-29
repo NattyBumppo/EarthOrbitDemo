@@ -19,7 +19,7 @@ public class RotateTowardsSun : MonoBehaviour
     {
         if (sunLight.type == LightType.Directional)
         {
-            transform.rotation = Quaternion.Inverse(sunLight.transform.rotation);
+            transform.rotation = Quaternion.LookRotation(-sunLight.transform.forward);
         }
         else if (sunLight.type == LightType.Point)
         {

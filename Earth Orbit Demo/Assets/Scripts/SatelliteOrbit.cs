@@ -11,17 +11,16 @@ public class SatelliteOrbit : MonoBehaviour
     
     public float orbitScaleFactor;
 
-    public bool simulateAtSuperSpeed;
-    public float superSpeedMultiplier;
-
     public string TLEStringTopLine;
     public string TLEStringBottomLine;
 
     private Satellite sat;
 
+    private ConfigManager configManager;
+
     float GetVernalEquinoxAngle()
     {
-        Julian j = new Julian(GetCurrentDateTime());
+        Julian j = new Julian(configManager.GetCurrentDateTime());
         float vernalEquinoxAngle = Mathf.Rad2Deg * (float)j.ToGmst();
 
         return vernalEquinoxAngle;
@@ -29,13 +28,15 @@ public class SatelliteOrbit : MonoBehaviour
 
     void Start()
     {
+        configManager = UnityEngine.Object.FindObjectOfType<ConfigManager>();
+
         Tle tle = new Tle("", TLEStringTopLine, TLEStringBottomLine);
         sat = new Satellite(tle);
     }
 
     void Update()
     {
-        Eci eci = sat.PositionEci(GetCurrentDateTime());
+        Eci eci = sat.PositionEci(configManager.GetCurrentDateTime());
 
         orbitingBody.transform.localPosition = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
 
@@ -47,17 +48,5 @@ public class SatelliteOrbit : MonoBehaviour
         orbitingBody.localRotation = Quaternion.identity;
 
         return;
-    }
-
-    DateTime GetCurrentDateTime()
-    {
-        if (simulateAtSuperSpeed)
-        {
-            return DateTime.UtcNow + TimeSpan.FromSeconds(Time.realtimeSinceStartup * superSpeedMultiplier);
-        }
-        else
-        {
-            return DateTime.UtcNow;
-        }
     }
 }

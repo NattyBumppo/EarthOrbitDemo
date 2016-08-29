@@ -12,32 +12,51 @@ public class TraceLineTrail : MonoBehaviour
     private int currentFrameCount;
     private List<Vector3> positions;
 
+    private ConfigManager configManager;
+
 	void Start()
     {
         currentFrameCount = 0;
         positions = new List<Vector3>();
+
+        configManager = UnityEngine.Object.FindObjectOfType<ConfigManager>();
+
+        lineRenderer.material = configManager.satelliteTrailmaterial;
     }
 	
 	void LateUpdate()
     {
-        // We probably don't want to sample/draw every frame
-        if (currentFrameCount % numFramesPerLine == 0)
+        if (configManager.drawSatelliteTrails)
         {
-            // Add this position along the line
-            positions.Add(transform.position);
+            lineRenderer.material = configManager.satelliteTrailmaterial;
 
-            // Remove oldest position, if we're storing too many
-            if (positions.Count > numStoredPositions)
+            // We probably don't want to sample/draw every frame
+            if (currentFrameCount % numFramesPerLine == 0)
             {
-                positions.RemoveAt(0);
-            }
+                // Add this position along the line
+                positions.Add(transform.position);
 
-            // Draw as line renderer
-            lineRenderer.SetVertexCount(positions.Count);
-            lineRenderer.SetPositions(positions.ToArray());
-            
-            currentFrameCount = 0;
+                // Remove oldest position, if we're storing too many
+                if (positions.Count > numStoredPositions)
+                {
+                    positions.RemoveAt(0);
+                }
+
+                // Draw as line renderer
+                lineRenderer.SetVertexCount(positions.Count);
+                lineRenderer.SetPositions(positions.ToArray());
+
+                currentFrameCount = 0;
+            }
+            currentFrameCount++;
         }
-        currentFrameCount++;
+
+        
+    }
+
+    public void EraseLine()
+    {
+        positions.Clear();
+        lineRenderer.SetVertexCount(0);
     }
 }
