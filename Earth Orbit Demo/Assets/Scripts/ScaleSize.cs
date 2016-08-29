@@ -34,11 +34,11 @@ public class ScaleSize : MonoBehaviour
 
         if (additionalLayer)
         {
-            float cloudLayerCurrentRadius = additionalLayer.GetComponent<SphereCollider>().radius;
+            float additionalLayerCurrentRadius = additionalLayer.GetComponent<SphereCollider>().radius;
 
-            float cloudLayerToMainObjectRadiusRatio = cloudLayerCurrentRadius / mainObjectCurrentRadius;
-            float cloudLayerScaleFactor = averageObjectRadiusKm * cloudLayerToMainObjectRadiusRatio * scaleMultiplier / cloudLayerCurrentRadius;
-            additionalLayer.localScale = new Vector3(cloudLayerScaleFactor, cloudLayerScaleFactor, cloudLayerScaleFactor);
+            float additionalLayerToMainObjectRadiusRatio = additionalLayerCurrentRadius / mainObjectCurrentRadius;
+            float additionalLayerScaleFactor = averageObjectRadiusKm * additionalLayerToMainObjectRadiusRatio * scaleMultiplier / additionalLayerCurrentRadius;
+            additionalLayer.localScale = new Vector3(additionalLayerScaleFactor, additionalLayerScaleFactor, additionalLayerScaleFactor);
         }
 
         mainObject.localScale = new Vector3(mainObjectScaleFactor, mainObjectScaleFactor, mainObjectScaleFactor);
