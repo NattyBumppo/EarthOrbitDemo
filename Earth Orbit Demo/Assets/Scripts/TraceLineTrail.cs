@@ -5,8 +5,6 @@ using System.Collections.Generic;
 public class TraceLineTrail : MonoBehaviour
 {
     public LineRenderer lineRenderer;
-    public int numFramesPerLine;
-    public int numStoredPositions;
     public Transform objectToTrack;
 
     private int currentFrameCount;
@@ -31,13 +29,13 @@ public class TraceLineTrail : MonoBehaviour
             lineRenderer.material = configManager.satelliteTrailmaterial;
 
             // We probably don't want to sample/draw every frame
-            if (currentFrameCount % numFramesPerLine == 0)
+            if (currentFrameCount % configManager.GetTraceOrbitNumFramesPerLine() == 0)
             {
                 // Add this position along the line
                 positions.Add(transform.position);
 
                 // Remove oldest position, if we're storing too many
-                if (positions.Count > numStoredPositions)
+                if (positions.Count > configManager.GetTraceOrbitNumStoredPositions())
                 {
                     positions.RemoveAt(0);
                 }

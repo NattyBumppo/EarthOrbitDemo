@@ -15,6 +15,11 @@ public class ConfigManager : MonoBehaviour
     public Material satelliteTrailmaterial;
     public Transform cloudLayer;
 
+    public int traceOrbitNumFramesPerLineNormal;
+    public int traceOrbitNumStoredPositionsNormal;
+    public int traceOrbitNumFramesPerLineSuperSpeed;
+    public int traceOrbitNumStoredPositionsSuperSpeed;
+    
     public List<Transform> satellites;
 
     const string dateFormatString = "M/dd/yy H:mm:ss";
@@ -29,6 +34,30 @@ public class ConfigManager : MonoBehaviour
 	void Update()
 	{
         SetDateTimeLabel();
+    }
+
+    public int GetTraceOrbitNumFramesPerLine()
+    {
+        if (simulateAtSuperSpeed)
+        {
+            return traceOrbitNumFramesPerLineSuperSpeed;
+        }
+        else
+        {
+            return traceOrbitNumFramesPerLineNormal;
+        }
+    }
+
+    public int GetTraceOrbitNumStoredPositions()
+    {
+        if (simulateAtSuperSpeed)
+        {
+            return traceOrbitNumStoredPositionsSuperSpeed;
+        }
+        else
+        {
+            return traceOrbitNumStoredPositionsNormal;
+        }
     }
 
     public void OnToggleSuperSpeed(bool newValue)
