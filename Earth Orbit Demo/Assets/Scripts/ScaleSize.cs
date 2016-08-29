@@ -8,21 +8,38 @@ public class ScaleSize : MonoBehaviour
     public float scaleMultiplier;
     public float averageObjectRadiusKm;
 
+    public bool forceOriginalScale;
+
     private float previousScaleMultiplier;
 
     void Start()
     {
-        ScaleObject();
-        previousScaleMultiplier = scaleMultiplier;
+        if (forceOriginalScale)
+        {
+            // Don't affect current scale!
+        }
+        else
+        {
+            ScaleObject();
+            previousScaleMultiplier = scaleMultiplier;
+        }
+
     }
 
     void Update()
     {
-        if (previousScaleMultiplier != scaleMultiplier)
+        if (forceOriginalScale)
         {
-            ScaleObject();
+            // Don't affect current scale!
+        }
+        else
+        {
+            if (previousScaleMultiplier != scaleMultiplier)
+            {
+                ScaleObject();
 
-            previousScaleMultiplier = scaleMultiplier;
+                previousScaleMultiplier = scaleMultiplier;
+            }
         }
     }
 
