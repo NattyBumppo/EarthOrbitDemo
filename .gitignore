@@ -1,0 +1,9 @@
+Library/
+Temp/
+obj/
+*.csproj
+"Earth Orbit Demo.CSharp.csproj"
+"Earth Orbit Demo.sln"
+"Earth Orbit Demo.suo"
+.vs/
+Builds/
