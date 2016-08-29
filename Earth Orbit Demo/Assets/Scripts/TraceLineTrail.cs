@@ -18,7 +18,7 @@ public class TraceLineTrail : MonoBehaviour
         positions = new List<Vector3>();
     }
 	
-	void Update()
+	void LateUpdate()
     {
         // We probably don't want to sample/draw every frame
         if (currentFrameCount % numFramesPerLine == 0)
