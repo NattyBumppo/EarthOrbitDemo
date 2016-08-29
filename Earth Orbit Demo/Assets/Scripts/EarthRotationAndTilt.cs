@@ -17,6 +17,29 @@ public class EarthRotationAndTilt : MonoBehaviour
 
     public bool maintainCorrectTilt;
 
+    private Quaternion initialRotation;
+
+    private ConfigManager configManager;
+
+    void Start()
+    {
+        // Save initial rotation
+        initialRotation = sunDirectionalLight.transform.rotation;
+
+        configManager = UnityEngine.Object.FindObjectOfType<ConfigManager>();
+    }
+
+	void Update()
+	{
+        RotateEarthToMatchUtcTime(this.transform, configManager.GetCurrentDateTime());
+
+        if (maintainCorrectTilt)
+        {
+            RotateToEffectTilt();
+        }
+        
+    }
+
     // Rotates the provided transform to match Earth's rotation in UTC time
     private void RotateEarthToMatchUtcTime(Transform t, DateTime utcTime)
     {
@@ -34,31 +57,14 @@ public class EarthRotationAndTilt : MonoBehaviour
         }
 
         double rotationAngleDeg = -360.0 * (secondsSinceNoon / SECONDS_PER_DAY);
-        
+
         t.localRotation = Quaternion.AngleAxis((float)rotationAngleDeg + correctionAngle, Vector3.up);
-    }
-
-	void Update()
-	{
-        RotateEarthToMatchUtcTime(this.transform, DateTime.UtcNow);
-        RotateEarthToMatchUtcTime(cloudLayer, DateTime.UtcNow);
-
-        if (maintainCorrectTilt)
-        {
-            RotateToEffectTilt();
-        }
-        
-    }
-
-    DateTime GetCurrentDateTime()
-    {
-        return DateTime.UtcNow;
     }
 
     private void RotateToEffectTilt()
     {
         // This is super-approximate...
-        double secondsSinceVernalEquinox = (GetCurrentDateTime() - new DateTime(GetCurrentDateTime().Year, 3, 20)).TotalSeconds;
+        double secondsSinceVernalEquinox = (configManager.GetCurrentDateTime() - new DateTime(configManager.GetCurrentDateTime().Year, 3, 20)).TotalSeconds;
         if (secondsSinceVernalEquinox < 0)
         {
             secondsSinceVernalEquinox += SECONDS_PER_YEAR;
@@ -75,6 +81,8 @@ public class EarthRotationAndTilt : MonoBehaviour
 
         Vector3 tiltVector = Quaternion.AngleAxis((float)rotationAmount, Vector3.up) * earthSunVector;
 
-        transform.Rotate(tiltVector, (float)EARTH_TILT_DEG);
+        // Reset to initial rotation, then apply calculated rotation
+        sunDirectionalLight.transform.rotation = initialRotation;
+        sunDirectionalLight.transform.RotateAround(transform.position, -tiltVector, (float)EARTH_TILT_DEG);
     }
 }

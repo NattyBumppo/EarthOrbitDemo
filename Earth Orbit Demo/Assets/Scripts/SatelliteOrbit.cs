@@ -44,6 +44,6 @@ public class SatelliteOrbit : MonoBehaviour
 
         orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
 
-        return;
+        transform.localRotation = Quaternion.identity;
     }
 }
