@@ -40,8 +40,10 @@ public class SatelliteOrbit : MonoBehaviour
 
         orbitingBody.transform.localPosition = new Vector3((float)eci.Position.X, (float)eci.Position.Z, (float)eci.Position.Y) * orbitScaleFactor;
 
+        // Local position x-value is in a coordinate frame where the x-axis points towards the vernal equinox.
+        // Let's transform it to axes where the x-axis points towards the Prime Meridian, so that
+        // it matches the Earth model
         float vernalEquinoxAngle = GetVernalEquinoxAngle();
-
         orbitingBody.RotateAround(centralBody.position, Vector3.up, vernalEquinoxAngle);
 
         transform.localRotation = Quaternion.identity;
