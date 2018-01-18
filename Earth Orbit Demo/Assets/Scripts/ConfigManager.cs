@@ -29,6 +29,17 @@ public class ConfigManager : MonoBehaviour
     void Start()
 	{
         timeSuperSpeedStarted = DateTime.UtcNow;
+
+        StartCoroutine(DrawTrailsAfterWait());
+    }
+
+    private IEnumerator DrawTrailsAfterWait()
+    {
+        yield return new WaitForSeconds(1.0f);
+        drawSatelliteTrails = true;
+        ClearSatelliteTrails();
+
+        
     }
 	
 	void Update()

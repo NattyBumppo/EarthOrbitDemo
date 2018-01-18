@@ -20,14 +20,16 @@ public class TraceLineTrail : MonoBehaviour
         configManager = UnityEngine.Object.FindObjectOfType<ConfigManager>();
 
         lineRenderer.material = configManager.satelliteTrailmaterial;
+
+        // Set a random line color
+        //lineRenderer.material.color = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+        lineRenderer.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.4f, 1f);
     }
-	
-	void LateUpdate()
+
+    void LateUpdate()
     {
         if (configManager.drawSatelliteTrails)
         {
-            lineRenderer.material = configManager.satelliteTrailmaterial;
-
             // We probably don't want to sample/draw every frame
             if (currentFrameCount % configManager.GetTraceOrbitNumFramesPerLine() == 0)
             {
@@ -48,8 +50,6 @@ public class TraceLineTrail : MonoBehaviour
             }
             currentFrameCount++;
         }
-
-        
     }
 
     public void EraseLine()
